@@ -22,18 +22,18 @@ function combine(reducers = []) {
     };
 }
 
+// TODO: pullback
 // (Value, Action) -> Void,
 // WritableKeyPath
 // CasePath
-function pullback(reducer, value, action) {
+function pullback(reducer, value) {
     return function(globalValue, globalAction) {
-        const localAction = globalAction[action];
-        if(!localAction) return;
-
-        reducer(globalValue[value], localAction);
+        reducer(globalValue[value], globalAction);
     };
 }
+
 // END Architecture Layer
+
 function AppState() {
     let count = 0;
     let primes = [];
@@ -46,20 +46,28 @@ function AppState() {
     };
 }
 
-const AppAction = {
+const CounterAction = {
     inc: 'inc',
     dec: 'dec',
+};
+
+const PrimesAction = {
     save: 'save',
     remove: 'remove',
 };
 
+const AppAction = {
+    Counter: CounterAction,
+    Primes: PrimesAction,
+};
+
 function counterReducer(state, action) {
     switch(action) {
-    case AppAction.inc:
+    case AppAction.Counter.inc:
         state.count += 1;
         break;
 
-    case AppAction.dec:
+    case AppAction.Counter.dec:
         state.count -= 1;
         break;
 
@@ -70,11 +78,11 @@ function counterReducer(state, action) {
 
 function primesReducer(state, action) {
     switch(action) {
-    case AppAction.save:
+    case AppAction.Primes.save:
         state.primes.push(state.count);
         break;
 
-    case AppAction.remove:
+    case AppAction.Primes.remove:
         state.primes.splice(state.primes.indexOf(state.count));
         break;
 
@@ -83,12 +91,26 @@ function primesReducer(state, action) {
     }
 }
 
+// Higher Order Reducers
+// ((Value, Action) -> Void) -> ((Value, Action) -> Void)
+function logging(reducer) {
+    return function(value, action) {
+        reducer(value, action);
+        console.log(`action: ${action}`);
+        console.log(`state: `, value);
+        console.log(`----------`);
+    };
+}
+// END Higher Order Reducers
+
 const appState = AppState();
+
 const appReducer = combine([
     counterReducer,
     primesReducer,
 ]);
-const store = Store.of(appState, appReducer);
+
+const store = Store.of(appState, logging(appReducer));
 
 export {
     Store,
@@ -103,6 +125,7 @@ export {
     appState,
     counterReducer,
     primesReducer,
+    logging,
     appReducer,
     store,
 }
