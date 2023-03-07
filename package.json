@@ -1,6 +1,16 @@
 {
-  "devDependencies": {
-    "vite": "^4.1.4",
-    "vitest": "^0.29.2"
-  }
+    "name": "The Composable Archotecture",
+    "version": "0.0.1",
+    "type": "module",
+    "private": true,
+    "scripts": {
+        "dev": "vite dev --open",
+        "build": "vite build",
+        "preview": "vite preview",
+        "test": "vitest"
+    },
+    "devDependencies": {
+        "vite": "^4.1.4",
+        "vitest": "^0.29.2"
+    }
 }
